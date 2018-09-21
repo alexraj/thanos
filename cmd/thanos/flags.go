@@ -31,7 +31,7 @@ func regCommonServerFlags(cmd *kingpin.CmdClause) (*string, *string, func(log.Lo
 
 	clusterAdvertiseAddr := cmd.Flag("cluster.advertise-address", "Explicit (external) ip:port address to advertise for gossip in gossip cluster. Used internally for membership only.").
 		String()
-	if strings.Index(clusterAdvertiseAdd, "$HOST") == 0 {
+	if strings.Index(clusterAdvertiseAddr, "$HOST") == 0 {
 		nodeIP := os.Getenv("HOST")
 		clusterAdvertiseAddr = strings.Replace(clusterAdvertiseAddr, "$HOST", nodeIP, 1)
 	}
