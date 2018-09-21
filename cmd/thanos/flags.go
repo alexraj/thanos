@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"os"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -30,6 +31,10 @@ func regCommonServerFlags(cmd *kingpin.CmdClause) (*string, *string, func(log.Lo
 
 	clusterAdvertiseAddr := cmd.Flag("cluster.advertise-address", "Explicit (external) ip:port address to advertise for gossip in gossip cluster. Used internally for membership only.").
 		String()
+	if strings.Index(clusterAdvertiseAdd, "$HOST") == 0 {
+		nodeIP = os.Getenv("HOST")
+		clusterAdvertiseAddr = strings.Replace(clusterAdvertiseAddr, "$HOST", nodeIP, 1)
+	}
 
 	peers := cmd.Flag("cluster.peers", "Initial peers to join the cluster. It can be either <ip:port>, or <domain:port>. A lookup resolution is done only at the startup.").Strings()
 
