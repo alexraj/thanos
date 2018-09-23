@@ -10,6 +10,8 @@ import (
 	"path"
 	"sync"
 	"time"
+	"strings"
+	"os"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -57,6 +59,10 @@ func registerSidecar(m map[string]setupFunc, app *kingpin.Application, name stri
 	reloaderRuleDirs := cmd.Flag("reloader.rule-dir", "Rule directories for the reloader to refresh (repeated field).").Strings()
 
 	m[name] = func(g *run.Group, logger log.Logger, reg *prometheus.Registry, tracer opentracing.Tracer, _ bool) error {
+		if strings.Index((*promURL).Host, "$HOST") >= 0 {
+                	nodeIP := os.Getenv("HOST")
+                	(*promURL).Host = strings.Replace((*promURL).Host, "$HOST", nodeIP, 1)
+        	}	
 		rl := reloader.New(
 			log.With(logger, "component", "reloader"),
 			reloader.ReloadURLFromBase(*promURL),

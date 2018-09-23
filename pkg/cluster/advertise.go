@@ -2,6 +2,8 @@ package cluster
 
 import (
 	"net"
+	"strings"
+	"os"
 
 	"strconv"
 
@@ -12,6 +14,11 @@ import (
 // CalculateAdvertiseAddress deduce the external, advertise address that should be routable from other components.
 func CalculateAdvertiseAddress(bindAddr, advertiseAddr string) (string, int, error) {
 	if advertiseAddr != "" {
+		if strings.Index(advertiseAddr, "$HOST") == 0 {
+                       nodeIP := os.Getenv("HOST")
+                       advertiseAddr = strings.Replace(advertiseAddr, "$HOST", nodeIP, 1)
+                }
+
 		advHost, advPort, err := net.SplitHostPort(advertiseAddr)
 		if err != nil {
 			return "", 0, errors.Wrap(err, "invalid advertise address")
